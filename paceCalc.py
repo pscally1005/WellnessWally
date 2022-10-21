@@ -8,7 +8,7 @@ def pace_header():
     clear()
 
     print("PACE CALCULATOR")
-    print("This will allow you to calculate pace, distance, or time")
+    #print("This will allow you to calculate pace, distance, or time")
 
 # Pace calculator main function
 def pace_main():

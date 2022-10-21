@@ -6,7 +6,7 @@ from bmiCalc import *
 from paceCalc import *
 from splitCalc import *
 
-# Clears screen and prints the main menu title
+# Clears the screen and prints the main menu title
 def titlePrint():
     
     clear = lambda: os.system('clear')

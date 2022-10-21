@@ -8,7 +8,7 @@ def split_header():
     clear()
 
     print("SPLIT CALCULATOR")
-    print("This will allow you to calculate splits for a given pace")
+    #print("This will allow you to calculate splits for a given pace")
 
 # Split calculator main function
 def split_main():

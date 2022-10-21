@@ -31,7 +31,6 @@ def optionsPrint():
 
 # User selects an option
 def input():
-
     select = getch.getch()
     return select
 
@@ -39,14 +38,14 @@ def input():
 def selectOption(select):
 
     if select == "\r" or select == chr(27):
-        print("\nYou selected: \'\'")
+        print("\nYou entered: \'\'")
     else:
-        print("\nYou selected: \'" + select + "\'")
+        print("\nYou entered: \'" + select + "\'")
 
     if select == "1":
         print("Launching Nutrition Log...")
         nutritionLog_main()
-        return
+        return main()
 
     elif select == "2":
         print("Launching BMI Calculator...")
@@ -75,6 +74,7 @@ def selectOption(select):
 
 # Main function for program
 def main():
+
     titlePrint()
     optionsPrint()
     select = input()

@@ -73,7 +73,7 @@ def selectOption(select):
     optionsPrint()
     selectOption(select)
 
-# Main function
+# Main function for program
 def main():
     titlePrint()
     optionsPrint()

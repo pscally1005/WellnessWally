@@ -8,7 +8,7 @@ def nutritionLog_header():
     clear()
 
     print("NUTRITION LOG")
-    print("\nRate your nutrition today from 1 to 5")
+    print("\nThis will allow you to rate your nutrition for today")
 
 # Nutrition log main function
 def nutritionLog_main():

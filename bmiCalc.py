@@ -8,6 +8,7 @@ def bmi_header():
     clear()
 
     print("BMI CALCULATOR")
+    print("This will allow you to calculate your BMI")
 
 # BMI Calculator main function
 def bmi_main():

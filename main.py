@@ -27,7 +27,7 @@ def optionsPrint():
     print("3: Pace Calculator")
     print("4: Split Calculator")
     print("X: Exit")
-    print("Enter a number to select")
+    print("\nEnter a number to select")
 
 # User selects an option
 def input():
@@ -50,7 +50,7 @@ def selectOption(select):
     elif select == "2":
         print("Launching BMI Calculator...")
         bmi_main()
-        return
+        return main()
 
     elif select == "3":
         print("Launching Pace Calculator...")

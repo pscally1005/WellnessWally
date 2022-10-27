@@ -21,7 +21,7 @@ def bmi_unitSelect():
 # Checks the users unit input
 def bmi_checkUnit(unit):
 
-    if unit == "\r" or unit == chr(27):
+    if unit == "\r" or unit == "\n" or unit == chr(27):
         print("\nYou entered: \'\'")
     else:
         print("\nYou entered: \'" + unit + "\'")
@@ -64,11 +64,10 @@ def bmi_heightCalc(unit):
     # Converts negative to positive if necessary
     height = input()
     try:
+        for i in range(0, len(height)):
+            float(str(height)[i])
         height = float(height)
-        if height < 0:
-            height = height * -1
     except:
-        bmi_header()
         return bmi_heightCalc(unit)
         
     # If customary units, convert inches to meters
@@ -111,11 +110,10 @@ def bmi_weightCalc(unit, height):
     # Converts negative to positive if necessary
     weight = input()
     try:
+        for i in range(0, len(weight)):
+            float(str(weight)[i])
         weight = float(weight)
-        if weight < 0:
-            weight = weight * -1
     except:
-        bmi_header()
         return bmi_weightCalc(unit, height)
         
     # If customary units, convert inches to meters

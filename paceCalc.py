@@ -38,20 +38,55 @@ def pace_checkUnit(unit):
     pace_header()
     return pace_checkUnit(unit)
 
-# Clears screen, reprints info up until distance input
-def pace_clearForDistance(unit):
+# Clears screen, reprints info up until calculation select
+def pace_clearForSelect(unit):
     pace_header()
     assert (unit == "1") or (unit == "2"), "ERROR: You entered: " + str(unit)
     print("\nYou entered: \'" + unit + "\'")
     if unit == "1":
         print("\nUsing imperial units (mi)")
-    else:
+    elif unit == "2":
         print("\nUsing metric units (km)")
 
-# User input for distance
-def pace_inputDistance(unit):
+    print("\nWhat would you like to calculate?")
+    print("D: Distance")
+    print("T: Time")
+    print("P: Pace")
+    print("\nPlease enter a letter to select")
 
-    pace_clearForDistance(unit)
+# User selects dist, time, or pace for calculation
+def pace_select(unit):
+    pace_clearForSelect(unit)
+    select = getch.getch()
+    return select
+
+# Checks user calc selection input
+def pace_calcSelect(unit, select):
+
+    pace_clearForSelect(unit)
+    if select == "D" or select == 'd' or select == "T" or select == "t" or select == "P" or select == "p":
+        return select
+    else:
+        if select == "\r" or select == "\n" or select == chr(27):
+            print("\nYou entered: \'\'")
+        else:
+            print("\nYou entered: \'" + select + "\'")
+        print("ERROR: Input is invalid.  Please try again")
+        select = getch.getch()
+        return pace_calcSelect(unit, select)
+
+# Clears screen, reprints info up until distance input
+def pace_clearForDistance(unit, select):
+    pace_clearForSelect(unit)
+    print(select)
+
+# User input for distance
+def pace_inputDistance(unit, select):
+
+    pace_clearForDistance(unit, select)
+    if select == "d" or select == "D":
+        return "X"
+
     print("\nEnter a distance in", end = " ")
     if unit == "1":
         print("miles")
@@ -61,17 +96,17 @@ def pace_inputDistance(unit):
     # User must input float distance
     dist = input()
     try:
-        for i in range(0, len(dist)):
-            float(str(dist)[i])
         dist = float(dist)
+        if dist < 0:
+            dist = dist * -1
     except:
-        return pace_inputDistance(unit)
+        return pace_inputDistance(unit, select)
   
     return dist
 
 # Clears screen, reprints info up until time input
-def pace_clearForTime(unit, dist):
-    pace_clearForDistance(unit,)
+def pace_clearForTime(unit, select, dist):
+    pace_clearForDistance(unit, select)
     assert (unit == "1") or (unit == "2"), "ERROR: You entered: " + str(unit)
     print("\nEnter a distance in", end = " ")
     if unit == "1":
@@ -81,8 +116,10 @@ def pace_clearForTime(unit, dist):
     print(dist)
 
 # User input for time
-def pace_inputTime(unit, dist):
-    pace_clearForTime(unit, dist)
+def pace_inputTime(unit, select, dist):
+    pace_clearForTime(unit, select, dist)
+    if select == "t" or select == "T":
+        return "X"
     print("\nEnter a time (Format: HH:MM:SS)")
 
     # User must input time in format HH:MM:SS
@@ -105,20 +142,23 @@ def pace_inputTime(unit, dist):
         timeeMin = float(timeMin)
         timeSec = float(timeSec)
     except:
-        return pace_inputTime(unit, dist)
+        return pace_inputTime(unit, select, dist)
   
     return time
 
 # Clears screen, reprints info up until pace input
-def pace_clearForPace(unit, dist, time):
-    pace_clearForTime(unit, dist)
+def pace_clearForPace(unit, select, dist, time):
+    pace_clearForTime(unit, select, dist)
     assert (unit == "1") or (unit == "2"), "ERROR: You entered: " + str(unit)
     print("\nEnter a time (Format: HH:MM:SS)")
     print(time)
 
 # User input for pace
-def pace_inputPace(unit, dist, time):
-    pace_clearForPace(unit, dist, time)
+def pace_inputPace(unit, select, dist, time):
+    pace_clearForPace(unit, select, dist, time)
+    if select == "p" or select == "P":
+        return "X"
+
     print("\nEnter a pace in", end = " ")
     if unit == "1":
         print("min/mi", end = " ")
@@ -143,13 +183,13 @@ def pace_inputPace(unit, dist, time):
         paceMin = float(paceMin)
         paceSec = float(paceSec)
     except:
-        return pace_inputPace(unit, dist, time)
+        return pace_inputPace(unit, select, dist, time)
   
     return pace   
 
 # Prints the user inputs before calculations
-def pace_printInputs(unit, dist, time, pace):
-    pace_clearForPace(unit, dist, time)
+def pace_printInputs(unit, select, dist, time, pace):
+    pace_clearForPace(unit, select, dist, time)
     print("\nEnter a pace in", end = " ")
     if unit == "1":
         print("min/mi", end = " ")
@@ -170,7 +210,6 @@ def pace_printInputs(unit, dist, time, pace):
 
 #TODO: paceSec and timeSec cant be >= 60
 #TODO: timeMin cant be >= 60, but paceMin can be
-#TODO: have user select which one they would like to calculate (either the x method or at start)
 #TODO: actual dist/time/pace calculations
 
 # Pace calculator main function
@@ -178,10 +217,12 @@ def pace_main():
     pace_header()
     unit = pace_unitSelect()
     unit = pace_checkUnit(unit)
-    dist = pace_inputDistance(unit)
-    time = pace_inputTime(unit, dist)
-    pace = pace_inputPace(unit, dist, time)
-    pace_printInputs(unit, dist, time, pace)
+    select = pace_select(unit)
+    select = pace_calcSelect(unit, select)
+    dist = pace_inputDistance(unit, select)
+    time = pace_inputTime(unit, select, dist)
+    pace = pace_inputPace(unit, select, dist, time)
+    pace_printInputs(unit, select, dist, time, pace)
 
 if __name__ == "__main__" :
     pace_main()

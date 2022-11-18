@@ -3,9 +3,7 @@ import getch
 from datetime import date
 from datetime import datetime
 
-# Prints nutrition log header message
-def nutritionLog_header():
-
+def nutritionLog_infoPrint(rating=-1):
     clear = lambda: os.system('clear')
     clear()
 
@@ -15,31 +13,22 @@ def nutritionLog_header():
 
     print("\nPlease rate your nutrition for today from 1 to 5")
 
+    if rating == -1: return
+    print(rating)
+    print("\nPlease describe why you rated your day as a \'" + rating + "\'")
+
 # User enters their rating from 1-5
 def nutritionLog_enterNum():
+    nutritionLog_infoPrint()
     rating = getch.getch()
-    return rating
-
-# Checks if the users rating is valid
-def nutritionLog_checkInput(rating):
-
-    if rating == "\r" or rating == chr(27):
-        print("\nYou entered: \'\'")
-    else:
-        print("\nYou entered: \'" + rating + "\'")
 
     if rating == "1" or rating == "2" or rating == "3" or rating == "4" or rating == "5":
-        print("\nPlease describe why you rated your day as a \'" + rating + "\'\n")
-        return
-    
-    print("ERROR: Input is invalid.  Please try again")
-    rating = getch.getch()
-    nutritionLog_header()
-    nutritionLog_checkInput(rating)
+        return rating
+    else: return nutritionLog_enterNum()    
 
 # User inputs their nutrition description
 def nutritionLog_desc(rating):
-
+    nutritionLog_infoPrint(rating)
     file = open("nutritionLog.txt", "a")
     desc = input()
 
@@ -49,9 +38,6 @@ def nutritionLog_desc(rating):
 
     file.write(dt + rating + " - " + desc + "\n")
     file.close()
-
-# Gives user option to return to main menu or stay on screen
-def nutritionLog_end():
 
     print("\nSaving...")
     print("\nEnter \'Y\' to to stay on this screen, or anything else to return")
@@ -64,11 +50,8 @@ def nutritionLog_end():
 
 # Nutrition log main function
 def nutritionLog_main():
-    nutritionLog_header()
     rating = nutritionLog_enterNum()
-    nutritionLog_checkInput(rating)
     nutritionLog_desc(rating)
-    nutritionLog_end()
 
 if __name__ == "__main__" :
     nutritionLog_main()

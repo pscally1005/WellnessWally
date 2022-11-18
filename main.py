@@ -55,12 +55,12 @@ def selectOption(select):
     elif select == "3":
         print("Launching Pace Calculator...")
         pace_main()
-        return
+        return main()
 
     elif select == "4":
         print("Launching Split Calculator...")
         split_main()
-        return
+        return main()
 
     elif select == "X" or select == "x":
         print("Quitting now...")

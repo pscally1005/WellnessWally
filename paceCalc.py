@@ -269,12 +269,12 @@ def pace_timeCalc(unit, select, dist, time, pace):
 
     d = dist
     p = pace_convPace(pace)
-    t = int( float(d) * float(p) )
+    t = float( float(d) * float(p)) + 10**-4
 
     # convert time in seconds back to string
     t = str(datetime.timedelta(seconds=t))
 
-    print("Calculated time: " + str(t))
+    print("Calculated time: " + str(t[0:10]))
 
 # Given a distance and a time, calculate pace
 def pace_paceCalc(unit, select, dist, time, pace):
@@ -282,28 +282,29 @@ def pace_paceCalc(unit, select, dist, time, pace):
 
     d = dist
     t = pace_convTime(time)
-    p_sec = int( float(t) / float(d) )
+    p_sec = float( float(t) / float(d) ) + 10**-4
 
     # convert pace in seconds back to string
     p = str(datetime.timedelta(seconds=p_sec))
-    p = p[3:7]
+    l = len(p)
+    p = p[3:l]
 
-    print("Calculated pace: " + p, end = " ")
+    print("Calculated pace: " + p[0:7], end = " ")
     assert unit == "1" or unit == "2"
     if unit == "1":
         print("min/mi", end = " ")
         p_minkm = p_sec / 1.60934
         #p_minkm is the min per km (pace), but as a decimal.  conv to proper format
         p_minkm = str(datetime.timedelta(seconds=p_minkm))
-        p_minkm = p_minkm[3:7]
-        print("(" + p_minkm + " min/km)")
+        p_minkm = p_minkm[3:l]
+        print("(" + p_minkm[0:7] + " min/km)")
     elif unit == "2":
         print("min/km", end = " ")
         p_minmi = p_sec * 1.60934
-        #p_minmi is the min per km (pace), but as a decimal.  conv to proper format
+        #p_minmi is the min per mi (pace), but as a decimal.  conv to proper format
         p_minmi = str(datetime.timedelta(seconds=p_minmi))
-        p_minmi = p_minmi[3:7]
-        print("(" + p_minmi + " min/mi)")
+        p_minmi = p_minmi[3:l]
+        print("(" + p_minmi[0:7] + " min/mi)")
 
 # Gives user option to return to main menu or stay
 def pace_end():

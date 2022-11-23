@@ -37,11 +37,6 @@ def input():
 # Takes to selected screen or prints error message
 def selectOption(select):
 
-    if select == "\r" or select == chr(27):
-        print("\nYou entered: \'\'")
-    else:
-        print("\nYou entered: \'" + select + "\'")
-
     if select == "1":
         print("Launching Nutrition Log...")
         nutritionLog_main()
@@ -66,7 +61,6 @@ def selectOption(select):
         print("Quitting now...")
         return
 
-    print("ERROR: Input is invalid.  Please try again")
     select = getch.getch()
     titlePrint()
     optionsPrint()

@@ -1,6 +1,9 @@
 import os
 import getch
 
+HEIGHT_TO_METRIC = 0.0254
+WEIGHT_TO_METRIC = 0.45351473922
+
 def is_number(s):
     try:
         float(s)
@@ -28,17 +31,13 @@ def bmi_infoPrint(unit=-1, height=-1, weight=-1):
     assert (unit == "1") or (unit == "2"), "ERROR: You entered: " + str(unit)
 
     print("\nPlease enter your height", end = " ")
-    if unit == "1":
-        print("(in)")
-    else:
-        print("(cm)")
+    if unit == "1": print("(in)")
+    else:   print("(cm)")
     if height == -1: return
-    if unit == "1":
-        h = height / 0.0254
-        print(h)
-    else:
-        h = height * 100
-        print(h)
+    if unit == "1": h = height / HEIGHT_TO_METRIC
+    else:  h = height * 100
+    h = str(round(h, 2))
+    print(h)
 
     print("\nPlease enter your weight", end = " ")
     if unit == "1":
@@ -46,12 +45,10 @@ def bmi_infoPrint(unit=-1, height=-1, weight=-1):
     else:
         print("(kg)")
     if weight == -1: return
-    if unit == "1":
-        w = weight / 0.45351473922
-        print(w)
-    else:
-        w = weight
-        print(w)
+    if unit == "1": w = weight / WEIGHT_TO_METRIC
+    else:   w = weight
+    w = str(round(w, 2))
+    print(w)
 
     bmi = weight / (height * height)
     bmi = round(bmi, 2)
@@ -59,7 +56,7 @@ def bmi_infoPrint(unit=-1, height=-1, weight=-1):
 
     if bmi < 18.5:
         print("You are in the UNDERWEIGHT weight range")
-    elif bmi >- 18.5 and bmi < 25:
+    elif bmi >= 18.5 and bmi < 25:
         print("You are in the NORMAL weight range")
     elif bmi >= 25 and bmi < 30:
         print("You are in the OVERWEIGHT weight range")
@@ -77,10 +74,7 @@ def bmi_unitSelect():
 # User inputs their height
 # Converts the inputted height (in or cm) to m
 def bmi_heightCalc(unit):
-
     bmi_infoPrint(unit)
-    # User must input float height
-    # Converts negative to positive if necessary
     height = input()
     if is_number(height) == False or float(height) <= 0:
         return bmi_heightCalc(unit)
@@ -88,7 +82,7 @@ def bmi_heightCalc(unit):
         
     # If customary units, convert inches to meters
     if unit == "1":
-        height = height * 0.0254
+        height = height * HEIGHT_TO_METRIC
 
     # If metric units, convert centimeters to meters
     else:
@@ -99,10 +93,7 @@ def bmi_heightCalc(unit):
 # User inputs their weight
 # Converts weight from lb to m, if necessary
 def bmi_weightCalc(unit, height):
-
     bmi_infoPrint(unit, height)    
-    # User must input float weight
-    # Converts negative to positive if necessary
     weight = input()
     if is_number(weight) == False or float(weight) <= 0:
         return bmi_weightCalc(unit, height)
@@ -110,7 +101,7 @@ def bmi_weightCalc(unit, height):
         
     # If customary units, convert inches to meters
     if unit == "1":
-        weight = weight * 0.45351473922
+        weight = weight * WEIGHT_TO_METRIC
 
     return weight 
 

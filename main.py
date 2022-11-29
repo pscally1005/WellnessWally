@@ -8,7 +8,6 @@ from splitCalc import *
 
 # Clears the screen and prints the main menu title
 def titlePrint():
-    
     clear = lambda: os.system('clear')
     clear()
 
@@ -20,7 +19,6 @@ def titlePrint():
 
 # Prints the menu options
 def optionsPrint():
-
     print()
     print("1: Nutrition Log")
     print("2: BMI Calculator")
@@ -36,7 +34,6 @@ def input():
 
 # Takes to selected screen or prints error message
 def selectOption(select):
-
     if select == "1":
         print("Launching Nutrition Log...")
         nutritionLog_main()
@@ -68,7 +65,6 @@ def selectOption(select):
 
 # Main function for program
 def main():
-
     titlePrint()
     optionsPrint()
     select = input()

@@ -8,7 +8,7 @@ def nutritionLog_infoPrint(rating=-1):
     clear()
 
     print("NUTRITION LOG")
-    print("\nThis will allow you to rate your nutrition for today amd why")
+    print("\nThis will allow you to rate your nutrition for today and why")
     print("This data will be saved to a log file")
 
     print("\nPlease rate your nutrition for today from 1 to 5")
@@ -43,10 +43,8 @@ def nutritionLog_desc(rating):
     print("\nEnter \'Y\' to to stay on this screen, or anything else to return")
     exit = getch.getch()
 
-    if exit == "Y" or exit == "y":
-        return nutritionLog_main()
-    else:
-        return
+    if exit == "Y" or exit == "y": return nutritionLog_main()
+    else: return
 
 # Nutrition log main function
 def nutritionLog_main():

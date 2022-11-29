@@ -13,15 +13,12 @@ def pace_infoPrint(unit=-1, select=-1, dist=-1, time=-1, pace=-1):
     print("\nEnter \'1\' to use imperial units (mi)")
     print("Enter \'2\' to use metric units (km)")
 
-    if unit == -1:
-        return
+    if unit == -1: return
     print(unit)
 
-    if unit == "1":
-        print("\nUsing imperial units (mi)")
-    elif unit == "2":
-        print("\nUsing metric units (km)")
     assert (unit == "1") or (unit == "2"), "ERROR: You entered: " + str(unit)
+    if unit == "1": print("\nUsing imperial units (mi)")
+    else:   print("\nUsing metric units (km)")
 
     print("\nWhat would you like to calculate?")
     print("D: Distance")
@@ -29,88 +26,62 @@ def pace_infoPrint(unit=-1, select=-1, dist=-1, time=-1, pace=-1):
     print("P: Pace")
     print("\nPlease enter a letter to select")
 
-    if select == -1:
-        return
+    if select == -1: return
     print(select)
 
-    if select == "d" or select == "D":
-        print("\nCalculating distance...")
-    elif select == "t" or select == "T":
-        print("\nCalculating time...")
-    elif select == "p" or select == "P":
-        print("\nCalculating pace...")
+    if select == "d" or select == "D": print("\nCalculating distance...")
+    elif select == "t" or select == "T": print("\nCalculating time...")
+    elif select == "p" or select == "P": print("\nCalculating pace...")
     assert select == "d" or select == "D" or select == "t" or select == "T" or select == "p" or select == "P"
 
     print("\nEnter a distance in", end = " ")
-    if unit == "1":
-        print("miles")
-    else:
-        print("kilometers")
+    if unit == "1": print("miles")
+    else: print("kilometers")
 
-    if dist == -1:
-        return
+    if dist == -1: return
     print(dist)
 
     print("\nEnter a time (Format: HH:MM:SS)")
-
-    if time == -1:
-        return
+    if time == -1: return
     print(time)
 
     print("\nEnter a pace in", end = " ")
-    if unit == "1":
-        print("min/mi", end = " ")
-    else:
-        print("min/km", end = " ")
+    if unit == "1": print("min/mi", end = " ")
+    else: print("min/km", end = " ")
     print("(Format: MM:SS)")
 
-    if pace == -1:
-        return
-    print(pace)
+    if pace == -1: return
+    elif pace == "X": print(pace)
+    else: 
+        s = pace_convPace(pace)
+        paceLead0 = str(datetime.timedelta(seconds=s + 10**-6))
+        print(paceLead0[0:-7])
 
     print()
     if dist != "X":
         print("You entered a distance of: " + str(dist), end = " ")
-        if unit == "1" : 
-            print("mi", end = " ")
-            d_km = dist * 1.60934
-            d_km = str(round(d_km, 2))
-            print("(" + d_km + " km)")
-        else : 
-            print("km", end = " ")
-            d_mi = dist / 1.60934
-            d_mi = str(round(d_mi, 2))
-            print("(" + d_mi + " mi)")
+        d = pace_distSwitchUnits(unit,dist)
+        if unit == "1": print("mi (" + d + " km)")
+        else:   print("km (" + d + " mi)")
 
-    if time != "X":
-        print("You entered a time of: " + time)
+    if time != "X": print("You entered a time of: " + time)
 
     if pace != "X":
+        print("You entered a pace of: " + paceLead0[0:-7], end = " ")
         p_sec = pace_convPace(pace)
-        print("You entered a pace of: " + pace, end = " ")
-        if unit == "1" :
-            print("min/mi", end = " ")
-            p_minkm = p_sec / 1.60934
-            #p_minkm is the min per km (pace), but as a decimal.  conv to proper format
-            p_minkm = str(datetime.timedelta(seconds=p_minkm))
-            p_minkm = p_minkm[3:7]
-            print("(" + p_minkm + " min/km)")
-        else : 
-            print("min/km", end = " ")
-            p_minmi = p_sec * 1.60934
-            #p_minmi is the min per km (pace), but as a decimal.  conv to proper format
-            p_minmi = str(datetime.timedelta(seconds=p_minmi))
-            p_minmi = p_minmi[3:7]
-            print("(" + p_minmi + " min/mi)")
+        p = pace_paceSwitchUnits(unit, p_sec)
+        if unit == "1": print("\mi (" + p + " \km )")
+        else: print("/km (" + p + " /mi )")
+
     print()
 
-# Checks the users unit input
-def pace_unitInput():
+# User selects imperial or metric units for calculations
+def pace_unitSelect():
     pace_infoPrint()
     unit = getch.getch()
     if unit == "1" or unit == "2":
         return unit
-    return pace_unitInput()
+    return pace_unitSelect()
 
 # Checks user calc selection input
 def pace_selectInput(unit):
@@ -123,17 +94,13 @@ def pace_selectInput(unit):
 # User input for distance
 def pace_distanceInput(unit, select):
     pace_infoPrint(unit, select)
-    if select == "d" or select == "D":
-        return "X"
+    if select == "d" or select == "D": return "X"
 
     # User must input float distance
     dist = input()
     try:
         dist = float(dist)
-        if dist < 0:
-            dist = dist * -1
-
-        if dist == 0:
+        if dist <= 0:
             dist = "a"
             int(dist)
     except:
@@ -143,8 +110,7 @@ def pace_distanceInput(unit, select):
 # User input for time
 def pace_timeInput(unit, select, dist):
     pace_infoPrint(unit, select, dist)
-    if select == "t" or select == "T":
-        return "X"
+    if select == "t" or select == "T": return "X"
 
     # User must input time in format HH:MM:SS
     time = input()
@@ -155,29 +121,21 @@ def pace_timeInput(unit, select, dist):
         timeHour, timeMin, timeSec = time.split(":")
         assert len(timeHour) == 2 and len(timeMin) == 2 and len(timeSec) == 2
 
-        float(timeHour[0])
-        float(timeHour[1])
-        float(timeMin[0])
-        float(timeMin[1])
-        float(timeSec[0])
-        float(timeSec[1])
+        int(timeHour[0])
+        int(timeHour[1])
+        int(timeMin[0])
+        int(timeMin[1])
+        int(timeSec[0])
+        int(timeSec[1])
 
         timeHour = int(timeHour)
         timeMin = int(timeMin)
         timeSec = int(timeSec)
 
-        if timeSec >= 60:
+        t = pace_convTime(time)
+        if timeSec >= 60 or timeMin >= 60 or t <= 0:
             timeSec = "a"
             int(timeSec)
-
-        if int(timeMin) >= 60:
-            timeMin = "a"
-            int(timeMin)
-
-        t = pace_convTime(time)
-        if t <= 0:
-            t = "a"
-            int(t)
 
     except:
         return pace_timeInput(unit, select, dist)
@@ -187,8 +145,7 @@ def pace_timeInput(unit, select, dist):
 # User input for pace
 def pace_paceInput(unit, select, dist, time):
     pace_infoPrint(unit, select, dist, time)
-    if select == "p" or select == "P":
-        return "X"
+    if select == "p" or select == "P": return "X"
 
     # User must input pace in format MM:SS
     pace = input()
@@ -207,14 +164,11 @@ def pace_paceInput(unit, select, dist, time):
         paceMin = int(paceMin)
         paceSec = int(paceSec)
 
-        if paceSec >= 60:
+        p = pace_convPace(pace)
+        if paceSec >= 60 or p <= 0:
             paceSec = "a"
             int(paceSec)
 
-        p = pace_convPace(pace)
-        if p <= 0:
-            p = "a"
-            int(p)
     except:
         return pace_paceInput(unit, select, dist, time)
   
@@ -241,27 +195,27 @@ def pace_convPace(pace):
     seconds = paceSec + (paceMin*60)
     return seconds
 
+# Converts distance to other unit
+def pace_distSwitchUnits(unit, dist):
+    d = -1
+    assert unit == "1" or unit == "2"
+    if unit == "1": d = dist * 1.60934
+    else :  d = dist / 1.60934
+    d = str(round(d, 2))
+    return d
+
 # Given a time and a pace, caculate distance
 def pace_distCalc(unit, select, dist, time, pace):
     assert(dist == "X")
-
     t = pace_convTime(time)
     p = pace_convPace(pace)
-    d = float(t) / float(p)
-    d = float(str(round(d, 2)))
+    d = float( str( round( float(t) / float(p), 2 ) ) )
 
     print("Calculated distance: " + str(d), end = " ")
     assert unit == "1" or unit == "2"
-    if unit == "1":
-        print("mi", end = " ")
-        d_km = d * 1.60934
-        d_km = str(round(d_km, 2))
-        print("(" + d_km + " km)")
-    elif unit == "2":
-        print("km", end = " ")
-        d_mi = d / 1.60934
-        d_mi = str(round(d_mi, 2))
-        print("(" + d_mi + " mi)")
+    d = pace_distSwitchUnits(unit,d)
+    if unit == "1": print("mi (" + d + " km)")
+    else:   print("km (" + d + " mi)")
 
 # Given a distance and a pace, calculate time
 def pace_timeCalc(unit, select, dist, time, pace):
@@ -273,8 +227,17 @@ def pace_timeCalc(unit, select, dist, time, pace):
 
     # convert time in seconds back to string
     t = str(datetime.timedelta(seconds=t))
+    print("Calculated time: " + str(t[0:-4]))
 
-    print("Calculated time: " + str(t[0:10]))
+# Converts pace from one unit to the other
+def pace_paceSwitchUnits(unit,pace):
+    assert unit == "1" or unit == "2"
+    p = -1
+    if unit == "1":   p = pace / 1.60934
+    else:   p = pace * 1.60934
+
+    p = str(datetime.timedelta(seconds=p + 10**-6))
+    return p[0:-4]
 
 # Given a distance and a time, calculate pace
 def pace_paceCalc(unit, select, dist, time, pace):
@@ -282,29 +245,16 @@ def pace_paceCalc(unit, select, dist, time, pace):
 
     d = dist
     t = pace_convTime(time)
-    p_sec = float( float(t) / float(d) ) + 10**-4
+    p_sec = float( float(t) / float(d) ) + 10**-6
 
     # convert pace in seconds back to string
     p = str(datetime.timedelta(seconds=p_sec))
-    l = len(p)
-    p = p[3:l]
 
-    print("Calculated pace: " + p[0:7], end = " ")
+    print("Calculated pace: " + p[0:-4], end = " ")
     assert unit == "1" or unit == "2"
-    if unit == "1":
-        print("min/mi", end = " ")
-        p_minkm = p_sec / 1.60934
-        #p_minkm is the min per km (pace), but as a decimal.  conv to proper format
-        p_minkm = str(datetime.timedelta(seconds=p_minkm))
-        p_minkm = p_minkm[3:l]
-        print("(" + p_minkm[0:7] + " min/km)")
-    elif unit == "2":
-        print("min/km", end = " ")
-        p_minmi = p_sec * 1.60934
-        #p_minmi is the min per mi (pace), but as a decimal.  conv to proper format
-        p_minmi = str(datetime.timedelta(seconds=p_minmi))
-        p_minmi = p_minmi[3:l]
-        print("(" + p_minmi[0:7] + " min/mi)")
+    p = pace_paceSwitchUnits(unit,p_sec)
+    if unit == "1": print("/mi (" + p + "/km )")
+    elif unit == "2":   print("/km (" + p + " /mi )")
 
 # Gives user option to return to main menu or stay
 def pace_end():
@@ -318,7 +268,7 @@ def pace_end():
 
 # Pace calculator main function
 def pace_main():
-    unit = pace_unitInput()
+    unit = pace_unitSelect()
     select = pace_selectInput(unit)
     dist = pace_distanceInput(unit, select)
     time = pace_timeInput(unit, select, dist)

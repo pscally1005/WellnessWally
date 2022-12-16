@@ -130,6 +130,10 @@ def split_calculator(unit, pace):
     print("13.1 mi:\t" + split_half)
     print("26.2 mi:\t" + split_full)
 
+    split_arr = [split_100, split_200, split_400, split_800, split_1k, split_16, split_1mi, split_5k, split_10k, split_half, split_full]
+    # print(split_arr)
+    return split_arr
+
 # Gives user option to return to main menu or stay
 def split_end():
     print("\nEnter \'Y\' to to stay on this screen, or anything else to return")

@@ -115,7 +115,8 @@ def pace_timeInput(unit, select, dist):
     # User must input time in format HH:MM:SS
     time = input()
     if len(time) != 8 or time[2] != ":" or time[5] != ":":
-        return pace_timeInput(unit, select, dist)
+        if len(time) == 5 and time[2] == ":": time = '00:' + time
+        else: return pace_timeInput(unit, select, dist)
 
     try:
         timeHour, timeMin, timeSec = time.split(":")
@@ -210,12 +211,18 @@ def pace_distCalc(unit, select, dist, time, pace):
     t = pace_convTime(time)
     p = pace_convPace(pace)
     d = float( str( round( float(t) / float(p), 2 ) ) )
+    old_d = d
 
     print("Calculated distance: " + str(d), end = " ")
     assert unit == "1" or unit == "2"
     d = pace_distSwitchUnits(unit,d)
-    if unit == "1": print("mi (" + d + " km)")
-    else:   print("km (" + d + " mi)")
+    new_d = d
+    if unit == "1":
+        print("mi (" + d + " km)")
+        return old_d, new_d
+    else:  
+        print("km (" + d + " mi)")
+        return new_d, old_d
 
 # Given a distance and a pace, calculate time
 def pace_timeCalc(unit, select, dist, time, pace):
@@ -223,11 +230,12 @@ def pace_timeCalc(unit, select, dist, time, pace):
 
     d = dist
     p = pace_convPace(pace)
-    t = float( float(d) * float(p)) + 10**-4
+    t = float( float(d) * float(p)) + 10**-6
 
     # convert time in seconds back to string
     t = str(datetime.timedelta(seconds=t))
     print("Calculated time: " + str(t[0:-4]))
+    return t[0:-4]
 
 # Converts pace from one unit to the other
 def pace_paceSwitchUnits(unit,pace):
@@ -249,22 +257,28 @@ def pace_paceCalc(unit, select, dist, time, pace):
 
     # convert pace in seconds back to string
     p = str(datetime.timedelta(seconds=p_sec))
+    old_p = p
 
     print("Calculated pace: " + p[0:-4], end = " ")
     assert unit == "1" or unit == "2"
     p = pace_paceSwitchUnits(unit,p_sec)
-    if unit == "1": print("/mi (" + p + "/km )")
-    elif unit == "2":   print("/km (" + p + " /mi )")
+    new_p = p
+    if unit == "1":
+        print("/mi (" + p + "/km )")
+    elif unit == "2": 
+        print("/km (" + p + " /mi )")
+
+    # return pace_mi, pace_km
+    if unit == "1": return old_p[0:-4], new_p
+    else: return new_p, old_p[0:-4]
 
 # Gives user option to return to main menu or stay
 def pace_end():
     print("\nEnter \'Y\' to to stay on this screen, or anything else to return")
     exit = getch.getch()
 
-    if exit == "Y" or exit == "y":
-        return pace_main()
-    else:
-        return
+    if exit == "Y" or exit == "y": return pace_main()
+    else: return
 
 # Pace calculator main function
 def pace_main():
@@ -275,12 +289,16 @@ def pace_main():
     pace = pace_paceInput(unit, select, dist, time)
 
     pace_infoPrint(unit, select, dist, time, pace)
+    [d_mi, d_km, t, p_mi, p_km] = [-1, -1, -1, -1, -1]
     if dist == "X":
-        pace_distCalc(unit, select, dist, time, pace)
+        d_mi, d_km = pace_distCalc(unit, select, dist, time, pace)
+        # print(str(d_mi) + " " + str(d_km))
     elif time == "X":
-        pace_timeCalc(unit, select, dist, time, pace)
+        t = pace_timeCalc(unit, select, dist, time, pace)
+        # print(t)
     elif pace == "X":
-        pace_paceCalc(unit, select, dist, time, pace)
+        p_mi, p_km = pace_paceCalc(unit, select, dist, time, pace)
+        # print(p_mi + " " + p_km)
     else:
         print("ERROR")
     pace_end()

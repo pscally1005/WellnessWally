@@ -23,8 +23,8 @@ def nutritionLog_enterNum():
     rating = getch.getch()
 
     if rating == "1" or rating == "2" or rating == "3" or rating == "4" or rating == "5":
-        return rating
-    else: return nutritionLog_enterNum()    
+        return rating, True
+    else: return nutritionLog_enterNum(), False    
 
 # User inputs their nutrition description
 def nutritionLog_desc(rating):
@@ -48,7 +48,7 @@ def nutritionLog_desc(rating):
 
 # Nutrition log main function
 def nutritionLog_main():
-    rating = nutritionLog_enterNum()
+    rating, flag = nutritionLog_enterNum()
     nutritionLog_desc(rating)
 
 if __name__ == "__main__" :

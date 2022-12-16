@@ -50,19 +50,6 @@ def bmi_infoPrint(unit=-1, height=-1, weight=-1):
     w = str(round(w, 2))
     print(w)
 
-    bmi = weight / (height * height)
-    bmi = round(bmi, 2)
-    print("\nYour BMI is: " + str(bmi))
-
-    if bmi < 18.5:
-        print("You are in the UNDERWEIGHT weight range")
-    elif bmi >= 18.5 and bmi < 25:
-        print("You are in the NORMAL weight range")
-    elif bmi >= 25 and bmi < 30:
-        print("You are in the OVERWEIGHT weight range")
-    else:
-        print("You are in the OBESE weight range")
-
 # User selects imperial or metric units for calculations
 def bmi_unitSelect():
     bmi_infoPrint()
@@ -105,9 +92,25 @@ def bmi_weightCalc(unit, height):
 
     return weight 
 
+# Actual calculation for user entered height and weight
+def bmi_calc(unit, height, weight):
+    bmi_infoPrint(unit, height, weight)
+    bmi = weight / (height * height)
+    bmi = round(bmi, 2)
+    print("\nYour BMI is: " + str(bmi))
+
+    if bmi < 18.5:
+        print("You are in the UNDERWEIGHT weight range")
+    elif bmi >= 18.5 and bmi < 25:
+        print("You are in the NORMAL weight range")
+    elif bmi >= 25 and bmi < 30:
+        print("You are in the OVERWEIGHT weight range")
+    else:
+        print("You are in the OBESE weight range")
+    return bmi
+
 # Gives user option to return to main menu or stay
 def bmi_end(unit, height, weight):
-    bmi_infoPrint(unit, height, weight)
     print("\nEnter \'Y\' to to stay on this screen, or anything else to return")
     exit = getch.getch()
 
@@ -121,6 +124,7 @@ def bmi_main():
     unit = bmi_unitSelect()
     height = bmi_heightCalc(unit)
     weight = bmi_weightCalc(unit, height)
+    bmi = bmi_calc(unit, height, weight)
     bmi_end(unit, height, weight)
 
 if __name__ == "__main__" :

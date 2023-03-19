@@ -130,9 +130,20 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
         protein = 0
         fdc_id = i
 
+        # file = open("test.txt", "w")
+        # file.write(str(parsed))
+        # file.close
+
+        # print('---------')
+        # for j in range(0, len(parsed)):
+        #     print(parsed['foodNutrients'][j]['nutrient']['id'], " ", parsed['foodNutrients'][j]['amount'])
+        # print('---------')
+
         # Loop over dictionary length to look for desired data
         for j in range(0, len(parsed)):
             try:
+                print(parsed['foodNutrients'][j]['nutrient']['id'], " ", parsed['foodNutrients'][j]['amount'])
+                
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1008:
                     energy = parsed['foodNutrients'][j]['amount']
 

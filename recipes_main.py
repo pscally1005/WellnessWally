@@ -4,19 +4,6 @@ from fooddata_central import *
 def recipes_main():
     os.system("clear")
 
-<<<<<<< HEAD
-    # food = {'quick oats': 40,
-    #          'powdered peanut butter': 13,
-    #          'vanilla casein protein powder': 15,
-    #          'chia seeds': 10,
-    #          'cocoa powder': 10,
-    #          'salt': 0.15,
-    #          'plain non-fat greek yogurt': 100,
-    #          'unsweetened applesauce': 50,
-    #          'unsweetened vanilla almond milk': 100}
-
-    food = {'semi-sweet chocolate chips': 100}
-=======
     food = {'quick oats': 40,
              'powdered peanut butter': 13,
              'vanilla casein protein powder': 15,
@@ -44,7 +31,6 @@ def recipes_main():
     #         'black pepper': 1}
 
     # TODO: input amount of servings
->>>>>>> 94348d60634575a43d05aa7208e7974f6049e6e5
     
     fc_main(food)
 

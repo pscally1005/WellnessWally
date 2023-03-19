@@ -8,11 +8,13 @@ from fuzzywuzzy import fuzz
 import os
 
 from recipes_main import *
+from loadingBar import*
 
 api_key = 'M0vNnETsfDcZHzDH1c4XrmNzmODhVFozxZVf0WX3'
 
 # Search each entry in top_products_by_aisle by USDA database through API
 def fdcID_retrieval(food_to_search, branded=True, api_key=api_key):
+    
     '''
     This function uses USDA's REST access API to retrieve
     information from FoodData Central (https://fdc.nal.usda.gov/).
@@ -33,6 +35,12 @@ def fdcID_retrieval(food_to_search, branded=True, api_key=api_key):
     fdcIDs : list
         The most likely FDCIDs for the food items searched.
     '''
+
+    # Progress Bar
+    l = len(food_to_search)+1
+    barLength = 50
+    printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete\tLocating fdcIDs...', length = barLength)
+
     # set API details
     requested_url = 'https://api.nal.usda.gov/fdc/v1/search?api_key='
     headers = {'Content-Type': 'application/json'}
@@ -103,22 +111,39 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
 
     # Set container storage and ordering
     nutrient_container = []
-    nutrient_list = ['name', 'total_fat', 'sat_fat', 'cholesterol', 'sodium',
-    'carbs', 'fiber','sugars', 'added_sugar', 'protein', 'fdcID']
+    nutrient_list = [
+                        'name', 
+                        'kcal', 
+                        'grams', 
+                        'total_fat', 
+                        'sat_fat', 
+                        'cholesterol', 
+                        'sodium',
+                        'carbs', 
+                        'fiber',
+                        'sugars', 
+                        # 'added_sugar', 
+                        'protein', 
+                        'fdcID'
+                    ]
     nutrient_container.append(nutrient_list)
 
     # set API details
     USDA_URL = 'https://api.nal.usda.gov/fdc/v1/'
     headers = {'Content-Type': 'application/json'}
+
     # Loop over each FDCID; commit a API request for each
+    l = len(fdcIDs)+1
+    barLength = 50
+    count = 1
     for i in fdcIDs:
         fdcId = str(i)
         requested_url = USDA_URL + fdcId + '?api_key=' + api_key
         response = requests.get(requested_url, headers=headers)
         parsed = json.loads(response.content)
         name = parsed['description'][0:40]
-        energy = 0
-        amount = 100
+        kcal = 0
+        grams = 100
         total_fat = 0
         sat_fat = 0
         cholesterol = 0
@@ -126,9 +151,13 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
         carbs = 0
         fiber = 0
         sugars = 0
-        added_sugar = 0
+        # added_sugar = 0
         protein = 0
         fdc_id = i
+
+        nameLength = 40
+        s = 'Complete\tFinding nutrition information for ' + name[0:nameLength] + '...' + ''.ljust(nameLength)
+        printProgressBar(count, l, prefix = 'Progress:', suffix = s, length = barLength)
 
         # file = open("test.txt", "w")
         # file.write(str(parsed))
@@ -142,10 +171,10 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
         # Loop over dictionary length to look for desired data
         for j in range(0, len(parsed)):
             try:
-                print(parsed['foodNutrients'][j]['nutrient']['id'], " ", parsed['foodNutrients'][j]['amount'])
+                # print(parsed['foodNutrients'][j]['nutrient']['id'], " ", parsed['foodNutrients'][j]['amount'])
                 
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1008:
-                    energy = parsed['foodNutrients'][j]['amount']
+                    kcal = parsed['foodNutrients'][j]['amount']
 
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1004:
                     total_fat = parsed['foodNutrients'][j]['amount']
@@ -168,28 +197,57 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 2000:
                     sugars = parsed['foodNutrients'][j]['amount']
 
-                if parsed['foodNutrients'][j]['nutrient']['id'] == 1167:
-                    added_sugar = parsed['foodNutrients'][j]['amount']
+                # if parsed['foodNutrients'][j]['nutrient']['id'] == 1167:
+                #     added_sugar = parsed['foodNutrients'][j]['amount']
 
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1003:
                     protein = parsed['foodNutrients'][j]['amount']
 
             # In case of nutrition not found; continue anyways
             except:
-                    pass
-        
+                    pass        
 
         # append data
-        nutrient_container.append([name, energy, amount, total_fat, sat_fat, cholesterol,
-        sodium, carbs, fiber, sugars, added_sugar, protein, fdc_id])
+        nutrient_container.append( [
+                                    name, 
+                                    kcal, 
+                                    grams, 
+                                    total_fat, 
+                                    sat_fat, 
+                                    cholesterol,
+                                    sodium, 
+                                    carbs, 
+                                    fiber, 
+                                    sugars, 
+                                    # added_sugar, 
+                                    protein, 
+                                    fdc_id
+                                   ]
+                                )
 
         # turn nutrient_list into df for preprocessing
-        nutrient_df = pd.DataFrame(data=nutrient_container[1::],
-                                   columns=['name', 'kcal', 'grams', 'total_fat [g]', 'sat_fat [g]',
-                                            'cholesterol [mg]', 'sodium [mg]', 'carbs [g]',
-                                            'fiber [g]', 'sugars [g]', 'added sugar [g]', 'protein [g]',
-                                            'fdcID'])
+        nutrient_df = pd.DataFrame  (data=nutrient_container[1::],
+                                     columns=   [
+                                                    'name', 
+                                                    'kcal', 
+                                                    'grams', 
+                                                    'total_fat [g]', 
+                                                    'sat_fat [g]',
+                                                    'cholesterol [mg]', 
+                                                    'sodium [mg]', 
+                                                    'carbs [g]',
+                                                    'fiber [g]', 
+                                                    'sugars [g]', 
+                                                    # 'added sugar [g]', 
+                                                    'protein [g]',
+                                                    'fdcID'
+                                                ]
+                                    )
 
+        count = count+1
+
+    printProgressBar(count, l, prefix = 'Progress:', suffix = 'Complete', length = barLength)
+    print()
     return nutrient_df
 
 
@@ -224,19 +282,23 @@ def nutrient_preprocessing(dataframe, amount):
 
     return dataframe
 
-def fc_main(foods):
+def fc_main(name, foods, servings):
+    print("\nNutritional information for 1 serving of", name.upper(), "\n")
+
     food_list = list(foods.keys())
     amount = list(foods.values())
-
+    for i in range(0,len(amount)): amount[i] = amount[i] / servings
+    
     fdcIDs = fdcID_retrieval(food_list)
     nutrient_df = nutrition_retrieval(fdcIDs=fdcIDs, api_key=api_key)
     nutrient_df = nutrient_preprocessing(nutrient_df, amount)
 
+    print("FOR EACH INGREDIENT")
     print(nutrient_df.to_string(index=False))
     print('\nTOTALS')
     print(nutrient_df.drop(['grams', 'fdcID', 'name'], axis=1).sum().to_string())
 
-    # TODO: ADDED SUGARS
+    # TODO: ADDED SUGARS (idk if this is possible)
 
 
 if __name__ == "__main__" :

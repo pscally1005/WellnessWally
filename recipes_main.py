@@ -1,7 +1,8 @@
 import os
 from fooddata_central import *
 
-def recipes_infoPrint(name="", servings="", foods={}):
+# info line printing for recipes_main.py
+def recipes_infoPrint(name="", servings="", foods={}, comments=[]):
     os.system("clear")
     print("RECIPE CREATOR")
     
@@ -13,13 +14,16 @@ def recipes_infoPrint(name="", servings="", foods={}):
 
     if(foods == {}): return
     print('\nEnter the ingredients of your recipe')
-    print('Format: <name>,<grams>.  Enter nothing to finish')
+    print('Format: <name>,<grams>,<optional comment>.  Enter nothing to finish')
+    assert(len(foods) == len(comments))
     i = 1
     for x in foods:
-        print('\t', i, ': ', x, ',', foods[x], sep='')
+        if(comments[i-1] != ""): print('\t', i, ': ', x, ',', foods[x], ',', comments[i-1], sep='')
+        else: print('\t', i, ': ', x, ',', foods[x], sep='')
         i = i+1
 
 # user enters the name of their recipe
+# returns the name of the recipe
 def recipes_enterName():
     recipes_infoPrint()
     print("\nEnter the name of your recipe: ", end="")
@@ -30,6 +34,7 @@ def recipes_enterName():
     return name
 
 # user enters the number of servings of their recipe
+# returns the entered number of servings of the recipe
 def recipes_enterServings(name):
     recipes_infoPrint(name)
     print("\nEnter the number of servings: ", end="")
@@ -42,13 +47,17 @@ def recipes_enterServings(name):
     return servings
 
 # user enters the ingredients of their recipe
+# checks if food is valid, or if amount is an integer
+# returns the list of foods, list of their fdcIDs, and optional comments about each item
 def recipes_enterFood(name,servings):
     recipes_infoPrint(name,servings)
 
     print("\nEnter the ingredients of your recipe")
-    print('Format: <name>,<grams>.  Enter nothing to finish')
+    print('Format: <name>,<grams>,<optional comment>.  Enter nothing to finish')
     user = "temp"
     food = {}
+    ids = {}
+    comments = {}
     
     count = 1
     while(len(user) != 0 and user.isspace() == False):
@@ -57,24 +66,29 @@ def recipes_enterFood(name,servings):
         user = input()
 
         arr = user.split(',')
-        if(len(arr) != 2): 
+        comment = ""
+        if(len(arr) != 2 and len(arr) != 3): 
             count = count-1
             continue
+        if(len(arr) == 3): comment = arr[2]
         
         name = arr[0]
         grams = arr[1]
         try:
             grams = int(grams)
+            foodList = [name]
+            idLst = fdcID_retrieval(foodList)
+            id = int(idLst[0])
         except:
             count = count-1
             continue
 
         food[name] = grams
+        ids[name] = id
+        comments[name] = comment
 
     if(len(food) == 0): food = recipes_enterFood(name,servings)
-    return food
-
-    # TODO: make sure food is valid
+    return food, ids.values(),list(comments.values())
 
 # combines above methods and sends foods/servings to fooddate_centray.py to print a set of nutrition facts
 def recipes_main():
@@ -112,9 +126,9 @@ def recipes_main():
     
     name = recipes_enterName()
     servings = recipes_enterServings(name)
-    food = recipes_enterFood(name,servings)
-    recipes_infoPrint(name,servings,food)
-    fc_main(name, food, servings)
+    food,ids,comments = recipes_enterFood(name,servings)
+    recipes_infoPrint(name,servings,food,comments)
+    fc_main(name, food, servings, ids)
 
 
 if __name__ == "__main__" :

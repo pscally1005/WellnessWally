@@ -37,9 +37,9 @@ def fdcID_retrieval(food_to_search, branded=True, api_key=api_key):
     '''
 
     # Progress Bar
-    l = len(food_to_search)+1
-    barLength = 50
-    printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete\tLocating fdcIDs...', length = barLength)
+    # l = len(food_to_search)+1
+    # barLength = 50
+    # printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete\tLocating fdcIDs...', length = barLength)
 
     # set API details
     requested_url = 'https://api.nal.usda.gov/fdc/v1/search?api_key='
@@ -133,7 +133,7 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
     headers = {'Content-Type': 'application/json'}
 
     # Loop over each FDCID; commit a API request for each
-    l = len(fdcIDs)+1
+    l = len(fdcIDs)
     barLength = 50
     count = 1
     for i in fdcIDs:
@@ -246,7 +246,7 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
 
         count = count+1
 
-    printProgressBar(count, l, prefix = 'Progress:', suffix = 'Complete', length = barLength)
+    # printProgressBar(count, l, prefix = 'Progress:', suffix = 'Complete', length = barLength)
     print()
     return nutrient_df
 
@@ -282,14 +282,15 @@ def nutrient_preprocessing(dataframe, amount):
 
     return dataframe
 
-def fc_main(name, foods, servings):
+def fc_main(name, foods, servings, ids):
     print("\nNutritional information for 1 serving of", name.upper(), "\n")
 
     food_list = list(foods.keys())
     amount = list(foods.values())
     for i in range(0,len(amount)): amount[i] = amount[i] / servings
     
-    fdcIDs = fdcID_retrieval(food_list)
+    # fdcIDs = fdcID_retrieval(food_list)
+    fdcIDs = ids
     nutrient_df = nutrition_retrieval(fdcIDs=fdcIDs, api_key=api_key)
     nutrient_df = nutrient_preprocessing(nutrient_df, amount)
 

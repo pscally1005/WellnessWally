@@ -6,27 +6,33 @@ def recipes_infoPrint(name="", servings="", foods={}, comments=[]):
     os.system("clear")
     print("RECIPE CREATOR")
     
+    print("\nEnter the name of your recipe:", name, end="")
     if(name == ""): return
-    print("\nEnter the name of your recipe:", name)
+    print()
 
+    print("\nEnter the number of servings:", servings, end="")
     if(servings == ""): return
-    print("\nEnter the number of servings:", servings)
+    print()
 
-    if(foods == {}): return
     print('\nEnter the ingredients of your recipe')
     print('Format: <name>,<grams>,<optional comment>.  Enter nothing to finish')
+    if(foods == {}): return
     assert(len(foods) == len(comments))
     i = 1
     for x in foods:
-        if(comments[i-1] != ""): print('\t', i, ': ', x, ',', foods[x], ',', comments[i-1], sep='')
-        else: print('\t', i, ': ', x, ',', foods[x], sep='')
+        if(comments[i-1] != ""): print('\t', i, ' : ', x, ',', foods[x], ',', comments[i-1], sep='')
+        else: print('\t', i, ' : ', x, ',', foods[x], sep='')
         i = i+1
+
+    # TODO: have it print the full name of the item so the user can confirm it is correct
+    # name as in the name retrived from the fdcID, not the string name the user entered
+    # example "banana" comes in as banana peanut butter, so BPB should be printed, because it corresponds to the found fdcID
+    # this would be so the user can check if the item they entered was correctly found
 
 # user enters the name of their recipe
 # returns the name of the recipe
 def recipes_enterName():
     recipes_infoPrint()
-    print("\nEnter the name of your recipe: ", end="")
     name = input()
 
     if(len(name) == 0 or name.isspace()): name = recipes_enterName()
@@ -37,7 +43,6 @@ def recipes_enterName():
 # returns the entered number of servings of the recipe
 def recipes_enterServings(name):
     recipes_infoPrint(name)
-    print("\nEnter the number of servings: ", end="")
 
     try:
         servings = int(input())
@@ -52,8 +57,6 @@ def recipes_enterServings(name):
 def recipes_enterFood(name,servings):
     recipes_infoPrint(name,servings)
 
-    print("\nEnter the ingredients of your recipe")
-    print('Format: <name>,<grams>,<optional comment>.  Enter nothing to finish')
     user = "temp"
     food = {}
     ids = {}

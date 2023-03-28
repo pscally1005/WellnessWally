@@ -136,6 +136,7 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
     l = len(fdcIDs)
     barLength = 50
     count = 1
+    nutrient_df = pd.DataFrame()
     for i in fdcIDs:
         fdcId = str(i)
         requested_url = USDA_URL + fdcId + '?api_key=' + api_key
@@ -247,7 +248,7 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
         count = count+1
 
     # printProgressBar(count, l, prefix = 'Progress:', suffix = 'Complete', length = barLength)
-    print()
+    # print()
     return nutrient_df
 
 

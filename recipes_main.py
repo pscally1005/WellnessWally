@@ -6,7 +6,7 @@ USDA_URL = 'https://api.nal.usda.gov/fdc/v1/'
 headers = {'Content-Type': 'application/json'}
 
 # info line printing for recipes_main.py
-def recipes_infoPrint(name="", servings="", foods={}, comments=[], productName=""):
+def recipes_infoPrint(name="", servings="", foods={}, comments=[], productNames=[]):
     os.system("clear")
     print("RECIPE CREATOR")
     
@@ -24,14 +24,9 @@ def recipes_infoPrint(name="", servings="", foods={}, comments=[], productName="
     assert(len(foods) == len(comments))
     i = 1
     for x in foods:
-        if(comments[i-1] != ""): print('\t', i, ' : ', x, ',', foods[x], ',', comments[i-1], "\t\t", productName, sep='')
-        else: print('\t', i, ' : ', x, ',', foods[x], "\t\t\t", productName, sep='')
+        if(comments[i-1] != ""): print('\t', i, ' : ', x, ',', foods[x], ',', comments[i-1][0:40], "\t", productNames[i-1], sep='')
+        else: print('\t', i, ' : ', x, ',', foods[x], "\t\t\t\t\t\t\t", productNames[i-1], sep='')
         i = i+1
-
-    # TODO: have it print the full name of the item so the user can confirm it is correct
-    # name as in the name retrived from the fdcID, not the string name the user entered
-    # example "banana" comes in as banana peanut butter, so BPB should be printed, because it corresponds to the found fdcID
-    # this would be so the user can check if the item they entered was correctly found
 
 # user enters the name of their recipe
 # returns the name of the recipe
@@ -65,7 +60,7 @@ def recipes_enterFood(name,servings):
     food = {}
     ids = {}
     comments = {}
-    productName = ""
+    productNames = []
     
     count = 1
     while(len(user) != 0 and user.isspace() == False):
@@ -101,10 +96,19 @@ def recipes_enterFood(name,servings):
         response = requests.get(requested_url, headers=headers)
         df = nutrition_retrieval(fdcIDs=isLst, api_key=api_key)
         parsed = json.loads(response.content)
-        productName = parsed['description'][0:40]
+        productName = parsed['description']
+        try:
+            productName = productName + " " + parsed['brandOwner']
+            productName = productName + " " + parsed['brandName']
+        except:
+            productName = productName
+        
+        # print(parsed)
+        # print(productName)
+        productNames.append(productName)
 
     if(len(food) == 0): food = recipes_enterFood(name,servings)
-    return food, ids.values(),list(comments.values()), productName
+    return food, ids.values(),list(comments.values()), productNames
 
 # combines above methods and sends foods/servings to fooddate_centray.py to print a set of nutrition facts
 def recipes_main():

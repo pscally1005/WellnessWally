@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from fuzzywuzzy import fuzz
 import os
+import getch
 
 # set API details
 api_key = 'M0vNnETsfDcZHzDH1c4XrmNzmODhVFozxZVf0WX3'
@@ -45,7 +46,7 @@ def nutritionFacts_getFDCID(food_to_search, branded=True, api_key=api_key):
         # convert to json format
         data_str = json.dumps(data).encode("utf-8")
         # commit an API request for the item
-        response = requests.post(requested_url + api_key, headers=headers, data=data_str)       # TODO: THIS LINE IS GIVING ISSUES
+        response = requests.post(requested_url + api_key, headers=headers, data=data_str)
         # parse the generated data
         parsed = json.loads(response.content)
         # set up metrics for eventual item selection
@@ -142,6 +143,12 @@ def nutritionFacts_getNutrition(fdcIDs, api_key=api_key):
         sugars = 0
         protein = 0
         fdc_id = i
+
+        try:
+            name = name + " " + parsed['brandOwner']
+            name = name + " " + parsed['brandName']
+        except:
+            name = name
 
         nameLength = 40
         s = 'Complete\tFinding nutrition information for ' + name[0:nameLength] + '...' + ''.ljust(nameLength)
@@ -292,8 +299,8 @@ def nutritionFacts_infoPrint(name="", servings="", foods={}, comments=[], produc
     assert(len(foods) == len(comments))
     i = 1
     for x in foods:
-        if(comments[i-1] != ""): print('\t', i, ' : ', x, ',', foods[x], ',', comments[i-1][0:40], "\t", productNames[i-1], sep='')
-        else: print('\t', i, ' : ', x, ',', foods[x], "\t\t\t\t\t\t\t", productNames[i-1], sep='')
+        if(comments[i-1] != ""): print('\t', i, ' : ', x, ',', foods[x], ',', comments[i-1][0:40], " -- ", productNames[i-1], sep='')
+        else: print('\t', i, ' : ', x, ',', foods[x], " -- ", productNames[i-1], sep='')
         i = i+1
 
 
@@ -335,7 +342,7 @@ def nutritionFacts_enterFood(name,servings):
     
     count = 1
     while(len(user) != 0 and user.isspace() == False):
-        print("\t", count, ": ", end="")
+        print("\t", count, " : ", end="", sep='')
         count = count+1
         user = input()
 
@@ -343,24 +350,26 @@ def nutritionFacts_enterFood(name,servings):
         comment = ""
         if(len(arr) != 2 and len(arr) != 3): 
             count = count-1
+            nutritionFacts_infoPrint(name,servings,food,list(comments.values()),productNames)
             continue
         if(len(arr) == 3): comment = arr[2]
         
-        name = arr[0]
+        enteredName = arr[0]
         grams = arr[1]
         isLst = []
         try:
             grams = int(grams)
-            foodList = [name]
+            foodList = [enteredName]
             idLst = nutritionFacts_getFDCID(foodList)
             id = int(idLst[0])
         except:
             count = count-1
+            nutritionFacts_infoPrint(name,servings,food,list(comments.values()),productNames)
             continue
 
-        food[name] = grams
-        ids[name] = id
-        comments[name] = comment
+        food[enteredName] = grams
+        ids[enteredName] = id
+        comments[enteredName] = comment
 
         fdcId = str(idLst[0])
         requested_url = USDA_URL + fdcId + '?api_key=' + api_key
@@ -376,8 +385,21 @@ def nutritionFacts_enterFood(name,servings):
         
         productNames.append(productName)
 
+        nutritionFacts_infoPrint(name,servings,food,list(comments.values()),productNames)
+
     if(len(food) == 0): food = nutritionFacts_enterFood(name,servings)
     return food, ids.values(),list(comments.values()), productNames
+
+
+# Gives user option to return to main menu or stay
+def nutritionFacts_end():
+    print("\nEnter \'Y\' to to stay on this screen, or anything else to return")
+    exit = getch.getch()
+
+    if exit == "Y" or exit == "y":
+        return nutritionFacts_main()
+    else:
+        return
 
 
 def nutritionFacts_main():
@@ -400,6 +422,8 @@ def nutritionFacts_main():
     print(nutrient_df.to_string(index=False))
     print('\nTOTALS')
     print(nutrient_df.drop(['grams', 'fdcID', 'name'], axis=1).sum().to_string())
+
+    nutritionFacts_end()
 
 if __name__ == "__main__":
     nutritionFacts_main()

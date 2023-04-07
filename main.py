@@ -5,6 +5,7 @@ from nutritionLog import *
 from bmiCalc import *
 from paceCalc import *
 from splitCalc import *
+from nutritionFacts import *
 
 # Clears the screen and prints the main menu title
 def titlePrint():
@@ -24,6 +25,7 @@ def optionsPrint():
     print("2: BMI Calculator")
     print("3: Pace Calculator")
     print("4: Split Calculator")
+    print("5: Nutrition Facts Calculator")
     print("X: Exit")
     print("\nEnter a number to select")
 
@@ -52,6 +54,11 @@ def selectOption(select):
     elif select == "4":
         print("Launching Split Calculator...")
         split_main()
+        return main()
+
+    elif select == "5":
+        print("Launching Nutrition Facts Calculator...")
+        nutritionFacts_main()
         return main()
 
     elif select == "X" or select == "x":

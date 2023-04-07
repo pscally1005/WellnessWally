@@ -300,8 +300,6 @@ def fc_main(name, foods, servings, ids):
     print('\nTOTALS')
     print(nutrient_df.drop(['grams', 'fdcID', 'name'], axis=1).sum().to_string())
 
-    # TODO: ADDED SUGARS (idk if this is possible)
-
 
 if __name__ == "__main__" :
     fc_main()

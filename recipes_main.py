@@ -75,6 +75,7 @@ def recipes_enterFood(name,servings):
     return food
 
     # TODO: make sure food is valid
+    # TODO: pass in an optional note for each food
 
 # combines above methods and sends foods/servings to fooddate_centray.py to print a set of nutrition facts
 def recipes_main():

@@ -13,7 +13,7 @@ from loadingBar import*
 api_key = 'M0vNnETsfDcZHzDH1c4XrmNzmODhVFozxZVf0WX3'
 
 # Search each entry in top_products_by_aisle by USDA database through API
-def fdcID_retrieval(food_to_search, branded=True, api_key=api_key):
+def fdcID_retrieval(food_to_search, branded=False, api_key=api_key):
     
     '''
     This function uses USDA's REST access API to retrieve
@@ -141,8 +141,14 @@ def nutrition_retrieval(fdcIDs, api_key=api_key):
         fdcId = str(i)
         requested_url = USDA_URL + fdcId + '?api_key=' + api_key
         response = requests.get(requested_url, headers=headers)
+
         parsed = json.loads(response.content)
-        name = parsed['description'][0:40]
+        name = parsed['description']
+        try:
+            name = parsed['brandName'] + " " + parsed['description']
+        except:
+            name = name
+
         kcal = 0
         grams = 100
         total_fat = 0

@@ -86,7 +86,7 @@ def bmi_weightCalc(unit, height):
         return bmi_weightCalc(unit, height)
     weight = float(weight)
         
-    # If customary units, convert inches to meters
+    # If customary units, convert lbs to kg
     if unit == "1":
         weight = weight * WEIGHT_TO_METRIC
 

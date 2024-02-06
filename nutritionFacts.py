@@ -7,6 +7,7 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 import os
 import getch
+import time
 
 # set API details
 api_key = 'M0vNnETsfDcZHzDH1c4XrmNzmODhVFozxZVf0WX3'
@@ -15,7 +16,7 @@ requested_url = 'https://api.nal.usda.gov/fdc/v1/search?api_key='
 headers = {'Content-Type': 'application/json'}
 
 # Search each entry in top_products_by_aisle by USDA database through API
-def nutritionFacts_getFDCID(food_to_search, branded=True, api_key=api_key):
+def nutritionFacts_getFDCID(food_to_search, api_key=api_key):
     
     '''
     This function uses USDA's REST access API to retrieve
@@ -37,10 +38,17 @@ def nutritionFacts_getFDCID(food_to_search, branded=True, api_key=api_key):
     fdcIDs : list
         The most likely FDCIDs for the food items searched.
     '''
-    # onitiate pull
+    # initiate pull
     fdcIDs = []  # container for results
     # for each item in the list
     for item in food_to_search:
+
+        # Exceptions
+        if item.lower() == "water":
+            return [2346283]
+        if item.lower() == "banana":
+            return [1105073]
+
         # pull item in list
         data = {"generalSearchInput": item}
         # convert to json format
@@ -49,36 +57,46 @@ def nutritionFacts_getFDCID(food_to_search, branded=True, api_key=api_key):
         response = requests.post(requested_url + api_key, headers=headers, data=data_str)
         # parse the generated data
         parsed = json.loads(response.content)
+
+        # index = -1
+        # for idx,i in enumerate(parsed['foods']):       
+        #     if i['dataType'] == "Survey (FNDDS)":
+        #         index = idx
+        #         break
+
         # set up metrics for eventual item selection
         best_idx = None
         best_ratio = 0
-        # for each item in the generated data
 
+        # for each item in the generated data
+        # foundation_index = -1
+        # survey_index = -1
         for idx, i in enumerate(parsed['foods']):
-            # if we are looking for a branded item
-            if branded is True:
-                # try condition for non-branded food
-                try:
-                    # use a flexibile levenshtein distance to compare
-                    curr_ratio = fuzz.token_set_ratio(item, i['brandOwner'] + ' ' + i['description'])
-                    # if we find better matches for what we are looking for
-                    if curr_ratio > best_ratio:
-                        # record them
-                        best_idx = idx
-                        best_ratio = curr_ratio
-                except:
-                    # in case of error/no result, pass
-                    pass
-            # if we are not looking for a branded item
-            if branded is False:
-                # do the same as above
-                try:
-                    curr_ratio = fuzz.token_set_ratio(item, i['description'])
-                    if curr_ratio > best_ratio:
-                        best_idx = idx
-                        best_ratio = curr_ratio
-                except:
-                    pass
+            try:
+                # if i['dataType'] == "Foundation" and foundation_index == -1:
+                #     foundation_index = idx
+
+                # if i['dataType'] == "Survey (FNDDS)" and survey_index == -1:
+                #     survey_index = idx   
+
+                curr_ratio = fuzz.token_set_ratio(item, i['description'])
+                if curr_ratio > best_ratio:
+                    best_idx = idx
+                    best_ratio = curr_ratio
+
+                # if survey_index != -1:
+                #     best_idx = survey_index
+
+                # if foundation_index != -1:
+                #     best_idx = foundation_index
+            except:
+                pass
+
+        # for i in parsed['foods'][best_idx]:
+        #     print(parsed['foods'][best_idx][i])
+        #     # print(i)
+        # time.sleep(1000)
+
         # save the best performing item as the most likely match from the db
         fdcIDs.append(parsed['foods'][best_idx]['fdcId'])
     return fdcIDs
@@ -156,9 +174,13 @@ def nutritionFacts_getNutrition(fdcIDs, api_key=api_key):
 
         # Loop over dictionary length to look for desired data
         for j in range(0, len(parsed)):
-            try:                
+            try:            
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1008:
                     kcal = parsed['foodNutrients'][j]['amount']
+
+                # calName = parsed['foodNutrients'][j]['nutrient']['name']
+                # if (calName == "Energy" or calName == "Energy (Atwater Specific Factors)") and kcal == 0:
+                #     kcal = parsed['foodNutrients'][j]['amount']
 
                 if parsed['foodNutrients'][j]['nutrient']['id'] == 1004:
                     total_fat = parsed['foodNutrients'][j]['amount']
